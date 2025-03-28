@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Daily Focus Launcher</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f7f7f7;
+    }
+    button {
+      font-size: 1.2rem;
+      padding: 1rem 2rem;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    button:active {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <button onclick="sendFocusData()">📤 Send Daily Focus</button>
+
+  <script>
+    async function sendFocusData() {
+      alert("🟢 Button clicked: attempting to fetch data...");
+
+      try {
+        const sheetDataUrl = "https://script.google.com/macros/s/AKfycbwFcOE97OVmzss5rjw65LS5mC4TmWLbUADXpWarFX7hI4amaoIjFw4jUVlU0KZ7CzTToQ/exec?mode=get";
+        const res = await fetch(sheetDataUrl);
+        const data = await res.json();
+
+        if (!data || !data.priorities) {
+          alert("⚠️ No data found in staging row.");
+          return;
+        }
+
+        const webhookUrl = "https://hook.us2.make.com/18vqqe3ttmpiajecnwks91bjmuvarxns";
+
+        await fetch(webhookUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+
+        alert("✅ Daily Focus sent!");
+      } catch (err) {
+        alert("❌ Error sending data: " + err);
+      }
+    }
+  </script>
+</body>
+</html>
